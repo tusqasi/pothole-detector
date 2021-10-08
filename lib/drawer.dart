@@ -7,7 +7,6 @@ class MyDrawer extends StatelessWidget {
     final imageUrl = "https://avatars.githubusercontent.com/u/60910265?v=4";
     return Drawer(
       child: Container(
-        
         color: Colors.deepPurple,
         child: ListView(
           padding: EdgeInsets.zero,
@@ -68,4 +67,3 @@ class MyDrawer extends StatelessWidget {
     );
   }
 }
- 
