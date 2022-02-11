@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
@@ -37,8 +38,12 @@ class _MyAppState extends State<MyApp> {
   late BitmapDescriptor mapMarker;
 
   Location location = Location();
-  late LocationData _currentPosition;
-  LatLng _initialcameraposition = LatLng(0.5937, 0.9629);
+
+  /// The location of delhi
+  final LatLng _delhiLoc = const LatLng(
+    28.65,
+    77.23,
+  );
 
   @override
   void initState() {
@@ -73,81 +78,44 @@ class _MyAppState extends State<MyApp> {
       _markers.add(Marker(
         markerId: const MarkerId("Pot hole here"),
         icon: mapMarker,
-        position: _center,
+        position: _delhiLoc,
       ));
     });
     mapController = controller;
 
-    LatLng current_pos;
-    location.onLocationChanged.listen((l) {
-      current_pos = LatLng(l.latitude!, l.longitude!);
+    location.onLocationChanged.listen((currentPosition) {
       mapController.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(l.latitude!, l.longitude!), zoom: 15),
+          CameraPosition(
+              target: LatLng(
+                currentPosition.latitude!,
+                currentPosition.longitude!,
+              ),
+              zoom: 15),
         ),
       );
     });
   }
 
-  /// The location of delhi
-  final LatLng _center = const LatLng(
-    28.65,
-    77.23,
-  );
-
   /// Puts a marker at the current map location
   ///
   /// Warning: Not on the physical current location
   void add_marker() async {
-    LatLng _marker_pos = await mapController
-        .getLatLng(ScreenCoordinate(
-          x: 500,
-          y: 1000,
-        ))
+    LatLng _map_position = await mapController
+        .getLatLng(
+          const ScreenCoordinate(
+            x: 500,
+            y: 1000,
+          ),
+        )
         .then((value) => value);
+
+    // adds a marker to the current position on map
     _markers.add(Marker(
       markerId: MarkerId("${_markers.length}"),
       icon: mapMarker,
-      position: _marker_pos,
+      position: _map_position,
     ));
-  }
-
-  getLoc() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-
-    /// Check if location is enabled
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    /// Check if location permission is given
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    /// Get current position on map
-    _currentPosition = await location.getLocation();
-    _initialcameraposition =
-        LatLng(_currentPosition.latitude!, _currentPosition.longitude!);
-
-    /// Update [_currentPosition] when changed
-    location.onLocationChanged.listen((LocationData currentLocation) {
-      print("${currentLocation.longitude} : ${currentLocation.longitude}");
-      setState(() {
-        _currentPosition = currentLocation;
-        _initialcameraposition =
-            LatLng(_currentPosition.latitude!, _currentPosition.longitude!);
-      });
-    });
   }
 
   @override
@@ -164,7 +132,7 @@ class _MyAppState extends State<MyApp> {
             GoogleMap(
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
-                target: _center,
+                target: _delhiLoc,
                 zoom: 11.0,
               ),
               buildingsEnabled: true,
@@ -186,7 +154,7 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: Colors.red,
                 splashColor: Colors.indigo,
                 onPressed: add_marker,
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
               ),
             ),
           ],
