@@ -138,12 +138,15 @@ class _MyAppState extends State<MyApp> {
               buildingsEnabled: true,
               markers: _markers,
             ),
-            Center(
+            Positioned(
+              top:0,
+              left: 20,
               child: Text(
-                'X: ${inclination["x"]?.toStringAsFixed(5)}\n'
-                'Y: ${inclination["y"]?.toStringAsFixed(5)}\n'
-                'Z: ${inclination["z"]?.toStringAsFixed(5)}\n'
-                'f: ${inclination["f"]?.toStringAsFixed(5)}\n',
+                'Inclination:\n'
+                'X: ${inclination["x"]?.toStringAsFixed(3)}\n'
+                'Y: ${inclination["y"]?.toStringAsFixed(3)}\n'
+                'Z: ${inclination["z"]?.toStringAsFixed(3)}\n'
+                'f: ${inclination["f"]?.toStringAsFixed(3)}\n',
               ),
             ),
             Positioned(
